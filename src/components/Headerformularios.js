@@ -15,7 +15,7 @@ const header= StyleSheet.create({
         height: 30,
         width: 30,
         marginLeft:15,
-        borderRadius: 100,
+        borderRadius: 90,
     },
     container:
     {

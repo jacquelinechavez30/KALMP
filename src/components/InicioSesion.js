@@ -1,4 +1,4 @@
-import { View, Text,TextInput,Button,Alert,Modal, Image, TouchableWithoutFeedback, Keyboard, ScrollView } from 'react-native'
+import { View, Text,TextInput,Button,Alert,Modal, Image, TouchableWithoutFeedback, Keyboard, ScrollView,ActivityIndicator } from 'react-native'
 import React, {useState} from 'react';
 import { Formik } from "formik";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -16,7 +16,7 @@ const validacion = Yup.object().shape({
   });
 
 export default function InicioSesion({setToken}) {
-
+  const [loading, setLoading] = useState(false);
   const ocultarTeclado = () => {
     Keyboard.dismiss();
   };
@@ -33,12 +33,14 @@ export default function InicioSesion({setToken}) {
 
     const iniciarSesion = async(values)=>{
         try {
+          setLoading(true);
             const response = await axios.post(url_post, {
                 email: values.email,
                 password: values.password
             });
             console.log(response);
             //Alert.alert('¡Éxito!',response.data.message);
+            
             Alert.alert('Sesión iniciada', '¡Bienvenido a KALMP!');
             if(response.data.token){
                 await AsyncStorage.setItem('token', response.data.token);
@@ -57,6 +59,14 @@ export default function InicioSesion({setToken}) {
     return (
         <>
         <TouchableWithoutFeedback onPress={() => ocultarTeclado()}>
+        <View style={styles.containerMain}>
+                    {loading ? ( // Mostrar spinner durante la carga
+                        <View style={styles.loadingContainer}>
+                            <ActivityIndicator size="large" color="#0000ff" />
+                            <Text >Cargando...</Text>
+                        </View>
+                    ) : (
+                        <>
         
         <View style={styles.containerMain}>
             
@@ -101,13 +111,15 @@ export default function InicioSesion({setToken}) {
         <Text style={styles.advice} onPress={() => navigation.navigate('Registro Usuario')}>¿No tienes cuenta? Regístrate</Text>
         </View>
         
-        
-        
+        </View>
+        </>
+        )}
+       
         </View>
         
         </TouchableWithoutFeedback>
         </>
-    )
+    );
 }
 
 const styles = {
@@ -161,5 +173,12 @@ const styles = {
         fontSize: 16,
         fontWeight: 'semibold',
         marginTop: 20,
+      },
+
+      loadingContainer: {
+        flex: 1, 
+        justifyContent: 'center', 
+        alignItems: 'center', 
+        backgroundColor: 'white', 
       },
 }

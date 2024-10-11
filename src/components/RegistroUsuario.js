@@ -1,5 +1,5 @@
-import { View, Text,TextInput,Button,Alert,Modal,TouchableOpacity,StyleSheet, Image, ScrollView } from 'react-native'
-import React from 'react';
+import { View, Text,TextInput,Button,Alert,Modal,TouchableOpacity,StyleSheet, Image, ScrollView, ActivityIndicator } from 'react-native'
+import React, { useState } from 'react';
 import { Formik } from "formik";
 import * as Yup from 'yup';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -9,7 +9,7 @@ import { useNavigation } from "@react-navigation/native";
 import CustomButton from './BotonCustomizado'; 
 const validacion = Yup.object().shape({
     name: Yup.string().typeError("El nombre debe ser en texto").required("Digite su nombre"),
-    email: Yup.string().email('debe ser un correo').required("Debe digitar su correo"),
+    email: Yup.string().email('Debe ser un correo').required("Debe digitar su correo"),
     password: Yup.string().typeError("la contraseña debe ser una cadena de texto").required("Digite su contraseña"),
       
   });
@@ -18,12 +18,14 @@ export default function RegistroUsuario() {
   const navigation = useNavigation();
     //para el dispositivo fisico
     const url_post = uri + '/adduser';
+    const [loading, setLoading] = useState(false);
     
   //const url= 'http://localhost:3001/api/adduser'
   //para el emulador
   //const url = 'http://10.0.2.2:3001/api/adduser';
 
       const agregarusuario = async(values)=>{
+        setLoading(true);
         try {
           const response = await axios.post(url_post, {
             name: values.name,
@@ -35,7 +37,8 @@ export default function RegistroUsuario() {
 
 
           navigation.navigate('VerificacionCorreo');
-        } catch (error) {
+        } 
+        catch (error) {
           if (axios.isAxiosError(error)) {
             if (error.response) {
           const errorMessage = error?.response?.data?.message || 'Problemas al realizar el registro intenta mas tarde';
@@ -51,6 +54,10 @@ export default function RegistroUsuario() {
         
         Alert.alert('¡ERROR!', 'Ocurrió un error inesperado.');
     }
+    
+}
+finally {
+  setLoading(false); 
 }
       };
   return (
@@ -93,11 +100,12 @@ export default function RegistroUsuario() {
           )}
          
 
-     {/*<Button title="Registrar" onPress={handleSubmit} />*/}
+         {loading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+              ) : (
      <CustomButton onPress={handleSubmit} title="Registrar">
-       {/*<Text style={estilo.botonText}>Registrar</Text>
-       <Icon name="account-plus" size={24}/>*/}
       </CustomButton>
+       )}
 
       <Text style={estilo.advice} onPress={() => navigation.navigate('VerificacionCorreo')}>¿No te verificastes? Verificate</Text>
         </View>

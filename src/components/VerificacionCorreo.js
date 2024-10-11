@@ -1,5 +1,5 @@
-import { View, Text,TextInput,Button,Alert, StyleSheet, Image,ScrollView } from 'react-native'
-import React from 'react'
+import { View, Text,TextInput,Button,Alert, StyleSheet, Image,ScrollView,ActivityIndicator} from 'react-native'
+import React,{ useState } from 'react'
 import { Formik } from "formik";
 import * as Yup from 'yup';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
@@ -19,7 +19,9 @@ const validacion = Yup.object().shape({
 export default function VerificacionCorreo() {
   const url_post = uri + '/verifyuser';
   const navigation = useNavigation();
+  const [loading, setLoading] = useState(false);
   const verificacion = async(values)=>{
+    setLoading(true); 
     try {
       const response = await axios.post(url_post, {
         email: values.email,
@@ -27,7 +29,7 @@ export default function VerificacionCorreo() {
       });
       //Alert.alert('¡Éxito!', response.data.message);
       
-      navigation.navigate('Inicio de Sesión');
+      navigation.navigate('InicioSesion');
     } catch (error) {
       //console.error('Error en la respuesta:', error.response?.data);
       if (axios.isAxiosError(error)) {
@@ -45,6 +47,9 @@ export default function VerificacionCorreo() {
   
   Alert.alert('¡ERROR!', 'Ocurrió un error inesperado.');
   };
+}
+finally {
+  setLoading(false); 
 }
 }
 
@@ -77,8 +82,11 @@ export default function VerificacionCorreo() {
                  {errors.code && touched.code && (
             <Text style={estilo.error}>{errors.code}</Text>
           )}
-
+ {loading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+              ) : (
           <CustomButton title="Verificar" onPress={handleSubmit} />
+              )}
         </View>
       )}
     </Formik>
