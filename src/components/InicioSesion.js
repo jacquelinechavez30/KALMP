@@ -42,7 +42,11 @@ export default function InicioSesion({setToken}) {
             Alert.alert('Sesión iniciada', '¡Bienvenido a KALMP!');
             if(response.data.token){
                 await AsyncStorage.setItem('token', response.data.token);
+               //correo para notificaciones 
+               await AsyncStorage.setItem('email', values.email);
                 setToken(response.data.token);
+                
+
             }
         } catch (error) {
         Alert.alert('¡ERROR!', error);

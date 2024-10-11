@@ -1,61 +1,54 @@
-import React, { useState, useEffect } from 'react';
-import { View, Alert } from 'react-native';
-import * as Notifications from 'expo-notifications';
+import { View, Text, Alert, Button } from 'react-native'
+import React, { useEffect, useState } from 'react'
 import axios from 'axios';
+import uri from "./Data";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
-const Notificaciones = ({ titulo, cuerpo, datos }) => {
-  const [tokenNotificacion, setTokenNotificacion] = useState('');
+export default function Notificaciones() {
+  const [email, setEmail] = useState('');
+  const url_post = uri+'/notificacion';
 
-  useEffect(() => {
-    const obtenerToken = async () => {
-      try {
-        const { status } = await Notifications.requestPermissionsAsync();
-        if (status !== 'granted') {
-          Alert.alert('Permisos no concedidos', 'No se pueden enviar notificaciones sin permisos.');
-          return;
+    useEffect(() => {
+        const obtenerEmail = async () => {
+            const correo = await AsyncStorage.getItem('email');
+            if (correo) {
+                setEmail(correo);  
+            }
+        };
+
+        obtenerEmail();
+    }, []);
+
+    const enviarCorreo = async () => {
+        if (!email) {
+            Alert.alert('¡ERROR!', 'No se ha encontrado un correo para enviar.');
+            return;
         }
 
-        const token = (await Notifications.getExpoPushTokenAsync({
-          projectId: 'a46893f9-5cbf-4f7b-9a40-92441804d0e7',
-        })).data;
-
-        console.log('Token de notificación:', token);
-        setTokenNotificacion(token);
-
-        if (token) {
-          enviarNotificacion(token);
-        }
+        try {
+          const response = await axios.post(url_post, { email });
+          console.log(response);
+          Alert.alert('Correo enviado', 'Se ha enviado el correo correctamente');
       } catch (error) {
-        console.error('Error al obtener el token de notificación:', error);
-      }
+          if (error.response) {
+              console.error('Error del servidor:', error.response.data);
+          } else if (error.request) {
+              console.error('No se recibió respuesta del servidor:', error.request);
+              //Alert.alert('¡ERROR!', 'No se recibió respuesta del servidor');
+          } else {
+              console.error('Error al configurar la solicitud:', error.message);
+              //Alert.alert('¡ERROR!', 'Error al configurar la solicitud');
+          }
+        }
     };
+  return (
+    <View>
+      <Text>Notificaciones</Text>
+      <Text>Correo de inicio de sesión: {email}</Text>
+      <Button title="Enviar notificaciones" onPress={enviarCorreo} />
 
-    obtenerToken();
-  }, [titulo, cuerpo]);
 
-  const enviarNotificacion = async (token) => {
-    const mensaje = {
-      to: token,
-      sound: 'default',
-      title: titulo || 'Titulo',
-      body: cuerpo || 'Contenido',
       
-    };
-
-    try {
-      await axios.post('https://exp.host/--/api/v2/push/send', mensaje, {
-        headers: {
-          Accept: 'application/json',
-          'Content-Type': 'application/json',
-        },
-      });
-      console.log(mensaje);
-    } catch (error) {
-      console.error('Error enviando la notificación:', error);
-    }
-  };
-
-  return;
-};
-
-export default Notificaciones;
+    </View>
+  )
+}
