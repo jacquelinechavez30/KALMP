@@ -20,7 +20,7 @@ export default function Actividades() {
     const [isDatePickerVisible, setDatePickerVisibility] = useState(false);
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [listactividades, setListActividades] = useState([]);
-    const [selectedActivity, setSelectedActivity] = useState(null); // Estado para la actividad seleccionada
+    const [selectedActivity, setSelectedActivity] = useState(null);
     const [idUser, setIdUser] = useState('');
 
     const url = uri + '/listactivity';
@@ -35,7 +35,8 @@ export default function Actividades() {
                     setToken(storedToken);
                     try {
                         const decodedToken = jwtDecode(storedToken);
-                        setIdUser(decodedToken.idUser); // Asumimos que el token tiene un campo idUser
+                        setIdUser(decodedToken.idUser);
+                        console.log('Token decodificado:', idUser);
                     } catch (decodeError) {
                         console.error('Error al decodificar el token:', decodeError);
                         Alert.alert('¡ERROR!', 'Ocurrió un error al decodificar el token.');
@@ -54,7 +55,8 @@ export default function Actividades() {
     useEffect(() => {
         const showList = async () => {
             try {
-                const response = await axios.get(url, {
+                console.log('idUser:', idUser);
+                const response = await axios.get(`${uri}/listactivity/${idUser}`, {
                     headers: {
                         Authorization: `Bearer ${token}`,
                         'Cache-Control': 'no-cache', // Desactivar caché
@@ -67,7 +69,7 @@ export default function Actividades() {
                 Alert.alert('¡ERROR!', 'Ocurrió un error inesperado.' + error.message);
             }
         };
-        if (token) {
+        if (token && idUser) {
             showList();
         }
     }, [token]);
@@ -308,7 +310,7 @@ export default function Actividades() {
                                             }}
                                             >
                                         </Icon>
-                                        <Icon
+                                        {/*<Icon
                                         name='check'
                                         size={25}
                                         color='white'
@@ -322,6 +324,7 @@ export default function Actividades() {
                                                         {text: 'Cancelar', onPress: () => console.log('Cancelado')},
                                                         {text: 'Aceptar', onPress: () => {
                                                             // funcion para marcar actividad como completada
+
                                                             setModalVisible(false);
                                                         }},
                                                     ],
@@ -330,8 +333,8 @@ export default function Actividades() {
                                             }
                                         }}
                                         >
-                                        </Icon>
-                                        <Icon
+                                        </Icon>*/}
+                                        {/*<Icon
                                         name='email'
                                         size={25}
                                         color='white'
@@ -352,7 +355,7 @@ export default function Actividades() {
                                                 );
                                             }
                                         }}>
-                                        </Icon>
+                                        </Icon>*/}
                                         </>
                                         ) : (
                                             null
@@ -488,8 +491,8 @@ const estilos = StyleSheet.create({
     },
     iconContainer: {
         flexDirection: 'row',
-        justifyContent: 'space-between',
         marginTop: 20,
-        marginHorizontal:20,
+        justifyContent: 'space-around',
+        marginHorizontal:0,
     },
 });

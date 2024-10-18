@@ -12,6 +12,7 @@ import { createStackNavigator } from '@react-navigation/stack';
 import { useEffect, useState } from 'react';
 import { Button } from 'react-native';
 import RegistroUsuario from './src/components/RegistroUsuario';
+import Actividades from './src/components/Actividades';
 
 const Tab = createBottomTabNavigator();
 
@@ -65,7 +66,11 @@ const App = () => {
   return (
     <NavigationContainer >
       {token ? (
-        <Tab.Navigator>
+        <Tab.Navigator
+        tabBarOptions={{
+          activeTintColor: '#596bff',
+        }}
+        >
           <Tab.Screen name="Home" options={{
             tabBarIcon: ({ size, color }) => (
               <Icon name="home" size={size} color={color} />
@@ -90,6 +95,18 @@ const App = () => {
             }}>
             {() => <Chatbot token={token} userId={userId} />}
           </Tab.Screen>
+          <Tab.Screen name="Actividades"
+          component={Actividades}
+            options={{
+              tabBarIcon: ({ size, color }) => (
+                <Icon name="clipboard-check" size={size} color={color} />
+              ),
+              headerShown: true,
+              headerTintColor: '#fff',
+              headerStyle: {backgroundColor: '#596bff'},
+            }}>
+            {/*{() => <Actividades setToken={setToken} userId={userId}/>}*/}
+            </Tab.Screen>
         </Tab.Navigator>
       ) : (
         <Stackdatos initialRouteName="InicioSesion" setToken={setToken} />
