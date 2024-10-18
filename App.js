@@ -3,7 +3,6 @@ import * as React from 'react';
 import { ActivityIndicator, View, TouchableOpacity, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import Config from './src/Config';
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
 import Chatbot from './src/components/Chatbot';
 import InicioSesion from './src/components/InicioSesion';
@@ -91,14 +90,6 @@ const App = () => {
             }}>
             {() => <Chatbot token={token} userId={userId} />}
           </Tab.Screen>
-          
-          <Tab.Screen name="Configuración" component={Config} options={{
-            tabBarIcon: ({ size, color }) => (
-              <Icon name="cog" size={size} color={color} />
-            ),
-            headerShown: false
-          }} />
-         
         </Tab.Navigator>
       ) : (
         <Stackdatos initialRouteName="InicioSesion" setToken={setToken} />
