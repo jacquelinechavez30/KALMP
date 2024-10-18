@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import * as React from 'react';
-import { ActivityIndicator, View } from 'react-native';
+import { ActivityIndicator, View, TouchableOpacity, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import Config from './src/Config';
@@ -20,6 +20,7 @@ const App = () => {
 
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [payload, setPayload] = useState(null);
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('token');
@@ -29,9 +30,15 @@ const App = () => {
   useEffect(() => {
     const checkToken = async () => {
       const storedToken = await AsyncStorage.getItem('token');
-      console.log('token: '+storedToken);
+      console.log('token: '+ storedToken);
       setToken(storedToken);
       setLoading(false);
+
+      if(storedToken) {
+        const decodePayload = jwtDecode(storedToken);
+        setPayload(decodePayload);
+        console.log('payload: '+decodePayload);
+      }
     };
     
     checkToken();
@@ -55,15 +62,19 @@ const App = () => {
   return (
       <NavigationContainer >
         {token ? (
-          <Tab.Navigator>
+            <Tab.Navigator>
             <Tab.Screen name="Home" options={{
             tabBarIcon: ({ size, color }) => (
               <Icon name="home" size={size} color={color} />
             ),
-            headerRight: () => (
-              <Button onPress={handleLogout} title="Cerrar Sesión" />
+            headerLeft: () => (
+              <TouchableOpacity style={{ marginLeft: 20, backgroundColor: '#596bff', paddingTop:10, paddingBottom:10, paddingLeft:10, paddingRight: 10, borderRadius:10 }} onPress={handleLogout}>
+                <Text style={{ color: 'white' }}>Cerrar Sesión</Text>
+              </TouchableOpacity>
             ),
-            headerShown: true
+            headerTitle: "Dashboard",
+            headerTitleAlign: 'center',
+            
           }}>
             {() => <Stackdatos initialRouteName="Home1" setToken={setToken} />}
           </Tab.Screen>
