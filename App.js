@@ -20,6 +20,7 @@ const App = () => {
 
   const [token, setToken] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [userId, setuserId] = useState(null)
   const [payload, setPayload] = useState(null);
 
   const handleLogout = async () => {
@@ -30,73 +31,81 @@ const App = () => {
   useEffect(() => {
     const checkToken = async () => {
       const storedToken = await AsyncStorage.getItem('token');
-      console.log('token: '+ storedToken);
+      const storedUserId = await AsyncStorage.getItem('userId')
+      console.log('token: ' + storedToken);
+      console.log('userId: ' + storedUserId)
       setToken(storedToken);
+      setuserId(storedUserId)
       setLoading(false);
 
-      if(storedToken) {
+      if (storedToken) {
         const decodePayload = jwtDecode(storedToken);
         setPayload(decodePayload);
-        console.log('payload: '+decodePayload);
+        console.log('payload: ' + decodePayload);
       }
     };
-    
+
     checkToken();
-    }, []);
+  }, []);
 
-    useEffect(() => {
-      if (token === null) {
-        console.log('Sesión cerrada: ' + token);
-      }
-    }, [token]);
-
-    if (loading) {
-      return (
-        <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-          <ActivityIndicator size="large" color="#0000ff" />
-        </View>
-      );
+  useEffect(() => {
+    if (token === null) {
+      console.log('Sesión cerrada: ' + token);
     }
-    
+  }, [token]);
+
+  if (loading) {
+    return (
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#0000ff" />
+      </View>
+    );
+  }
+
 
   return (
-      <NavigationContainer >
-        {token ? (
-            <Tab.Navigator>
-            <Tab.Screen name="Home" options={{
+    <NavigationContainer >
+      {token ? (
+        <Tab.Navigator>
+          <Tab.Screen name="Home" options={{
             tabBarIcon: ({ size, color }) => (
               <Icon name="home" size={size} color={color} />
             ),
             headerLeft: () => (
-              <TouchableOpacity style={{ marginLeft: 20, backgroundColor: '#596bff', paddingTop:10, paddingBottom:10, paddingLeft:10, paddingRight: 10, borderRadius:10 }} onPress={handleLogout}>
+              <TouchableOpacity style={{ marginLeft: 20, backgroundColor: '#596bff', paddingTop: 10, paddingBottom: 10, paddingLeft: 10, paddingRight: 10, borderRadius: 10 }} onPress={handleLogout}>
                 <Text style={{ color: 'white' }}>Cerrar Sesión</Text>
               </TouchableOpacity>
             ),
             headerTitle: "Dashboard",
             headerTitleAlign: 'center',
-            
+
           }}>
-            {() => <Stackdatos initialRouteName="Home1" setToken={setToken} />}
+            {() => <Stackdatos initialRouteName="Home1" setToken={setToken} setuserId={setuserId} />}
           </Tab.Screen>
-            <Tab.Screen name='Chatbot' component={Chatbot} options={{
-            tabBarIcon: ({size,color}) => (
-              <Icon name="chat" size={size} color={color}/>
+          <Tab.Screen name='Chatbot'
+            options={{
+              tabBarIcon: ({ size, color }) => (
+                <Icon name="chat" size={size} color={color} />
+              ),
+              headerShown: false
+            }}>
+            {() => <Chatbot token={token} userId={userId} />}
+          </Tab.Screen>
+          
+          <Tab.Screen name="Configuración" component={Config} options={{
+            tabBarIcon: ({ size, color }) => (
+              <Icon name="cog" size={size} color={color} />
             ),
             headerShown: false
-            }}/>
-            <Tab.Screen name="Configuración" component={Config} options={{
-            tabBarIcon: ({size,color}) => (
-              <Icon name="cog" size={size} color={color}/>
-            ),
-            headerShown: false
-            }}/>
-          </Tab.Navigator>
-        ) : (
-        <Stackdatos initialRouteName="InicioSesion" setToken={setToken}/>
-        )}
+          }} />
+         
+        </Tab.Navigator>
+      ) : (
+        <Stackdatos initialRouteName="InicioSesion" setToken={setToken} />
+      )}
     </NavigationContainer>
-    
-   
+
+
   );
 }
 
