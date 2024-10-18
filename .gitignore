@@ -1,0 +1,21 @@
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de editor
+*.swp
+*.swo
+
+# Directorios de compilación
+/build/
+/dist/
+
+# Directorios de dependencias
+/node_modules/
+
+# Configuraciones locales
+.env
+config/local.yml
+
+# Ignorar todos los archivos .log
+*.log
